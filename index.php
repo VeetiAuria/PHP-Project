@@ -57,7 +57,7 @@ class Blockchain {
     }
 }
 
-// Käytä tätä luokkaa äänien lisäämiseen ja hakuun tietokannasta.
+//Äänien lisääminen ja hakeminen tietokannasta
 class VoteDB {
     protected $db;
 
@@ -75,7 +75,6 @@ class VoteDB {
 }
 
 // Frontend (HTML + JavaScript)
-// Tässä on esimerkki siitä, miten voit luoda käyttöliittymän äänien lähettämiseen ja hakemiseen.
 ?>
 <!DOCTYPE html>
 <html>
@@ -102,7 +101,6 @@ class VoteDB {
         // Lähetä ääni backendiin.
     });
 
-    // Hae äänet backendistä ja näytä ne käyttöliittymässä.
     </script>
 </body>
 </html>
