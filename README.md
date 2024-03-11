@@ -1,5 +1,10 @@
 # PHP-Project
-PHP Project Web Application which uses Blockchain
+PHP Project Web Application which uses Blockchain.
+1. Users credentials gets hashed when account is created.
+2. User can login with correct information
+3. User gets to vote, after voting the vote gets into the database
+4. User can watch the results of previous and own votes. User id is so the voters id stays anyonymous.
+5. Enjoy the data of results
 
 Login page:
 
