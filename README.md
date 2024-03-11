@@ -20,7 +20,8 @@ Voting page:
 
 Results page:
 
-![image](https://github.com/VeetiAuria/PHP-Project/assets/127295067/f6cb4651-0cb1-41bb-bc80-ff769b799f6d)
+![image](https://github.com/VeetiAuria/PHP-Project/assets/127295067/f1640669-cba9-4877-a973-1f96206ce30d)
+
 
 
 
