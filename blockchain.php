@@ -26,10 +26,9 @@ if (!$connection) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Function to fetch blockchain data from the database
 function getBlockchainData($connection)
 {
-    $query = "SELECT * FROM votes";
+    $query = "SELECT * FROM votes ORDER BY timestamp ASC";
     $result = mysqli_query($connection, $query);
 
     $blockchainData = array();
@@ -38,10 +37,8 @@ function getBlockchainData($connection)
         $blockchainData[] = array(
             'index' => $row['id'],
             'timestamp' => $row['timestamp'],
-            'prev_hash' => $row['previous_hash'],
-            'curr_hash' => $row['hash'],
-            'vote' => $row['vote'],
-            'user_id' => $row['user_id'],
+            'prev_hash' => $row['previous_hash'], // Use the previous_hash from the database
+            'vote' => $row['hashed_vote'], // Use hashed_vote instead of vote
         );
     }
 
@@ -83,8 +80,8 @@ mysqli_close($connection);
             <tr>
                 <th>Block Index</th>
                 <th>Timestamp</th>
-                <th>Vote</th>
-                <th>Hashed User ID</th>
+                <th>Vote Hashed</th>
+                <th>Previous Vote</th>
             </tr>
         </thead>
         <tbody>
@@ -94,7 +91,7 @@ mysqli_close($connection);
                 echo "<td>{$block['index']}</td>";
                 echo "<td>{$block['timestamp']}</td>";
                 echo "<td>{$block['vote']}</td>";
-                echo "<td>" . hash("sha256", $block['user_id']) . "</td>";
+                echo "<td>{$block['prev_hash']}</td>"; // Display previous hash
                 echo "</tr>";
             }
             ?>
@@ -102,19 +99,18 @@ mysqli_close($connection);
     </table>
 
     <!-- Votes in Charts -->
-    <h2>Votes in Charts</h2>
-    <div id="chartContainer" style="display: flex; justify-content: space-between;">
+    <h2>Votes in Chart</h2>
+    <div id="chartContainer" style="display: flex; justify-content: center;">
         <div style="width: 45%;">
-            <canvas id="voteChart"></canvas>
-        </div>
-        <div style="width: 45%;">
+            <!-- The remaining chart -->
             <canvas id="totalVotesChart"></canvas>
         </div>
     </div>
 
     <!-- Logout link -->
     <div class="logout-link">
-        <p>You are logged in as <?php echo $_SESSION['username']; ?>. <br>
+        <p>You are logged in as
+            <?php echo $_SESSION['username']; ?>. <br>
             <a href="?logout=1">Logout</a>
         </p>
     </div>
@@ -124,34 +120,13 @@ mysqli_close($connection);
         var blockchainData = <?php echo json_encode($blockchainData); ?>;
 
         var voteCounts = {};
-        blockchainData.forEach(function (block) {
-            var vote = block.vote;
-            if (voteCounts[vote]) {
-                voteCounts[vote]++;
-            } else {
-                voteCounts[vote] = 1;
-            }
-        });
 
-        var ctx = document.getElementById('voteChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(voteCounts),
-                datasets: [{
-                    label: 'Vote Counts',
-                    data: Object.values(voteCounts),
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+        blockchainData.forEach(function (block) {
+            var nonHashedVote = block.vote; // Use 'vote' column instead of 'hashed_vote'
+            if (voteCounts[nonHashedVote]) {
+                voteCounts[nonHashedVote]++;
+            } else {
+                voteCounts[nonHashedVote] = 1;
             }
         });
 
