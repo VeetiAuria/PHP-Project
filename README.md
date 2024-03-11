@@ -7,7 +7,7 @@ Login page:
 
 Register page:
 
-![image](https://github.com/VeetiAuria/PHP-Project/assets/127295067/72197014-e368-49b7-9895-3b87388899d8)
+![image](https://github.com/VeetiAuria/PHP-Project/assets/127295067/18a0bae8-efba-4852-8ab8-e55b83a8daef)
 
 Voting page:
 
