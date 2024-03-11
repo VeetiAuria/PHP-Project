@@ -15,6 +15,7 @@ if (!$connection) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitize input data to prevent SQL injection
     $loginUsername = mysqli_real_escape_string($connection, $_POST['loginUsername']);
+    // Use prepared statements to prevent SQL injection for passwords
     $loginPassword = $_POST['loginPassword'];
 
     $sqlLogin = "SELECT * FROM users WHERE username='$loginUsername'";

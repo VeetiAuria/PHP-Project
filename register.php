@@ -18,24 +18,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = mysqli_real_escape_string($connection, $_POST['email']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    // Check if username or email already exists
-    $checkExistingUser = "SELECT * FROM users WHERE username='$username' OR email='$email'";
-    $resultExistingUser = mysqli_query($connection, $checkExistingUser);
-
-    if (mysqli_num_rows($resultExistingUser) > 0) {
-        $registrationError = "Username or email already exists!";
+    // Password repeater
+    $passwordRepeat = $_POST['passwordRepeat'];
+    if (!password_verify($passwordRepeat, $password)) {
+        $registrationError = "Passwords do not match!";
     } else {
-        // Insert new user into the database
-        $sqlRegister = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
-        $resultRegister = mysqli_query($connection, $sqlRegister);
+        // Check if username or email already exists
+        $checkExistingUser = "SELECT * FROM users WHERE username='$username' OR email='$email'";
+        $resultExistingUser = mysqli_query($connection, $checkExistingUser);
 
-        if (!$resultRegister) {
-            die("Registration failed: " . mysqli_error($connection));
+        if (mysqli_num_rows($resultExistingUser) > 0) {
+            $registrationError = "Username or email already exists!";
+        } else {
+            // Insert new user into the database
+            $sqlRegister = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
+            $resultRegister = mysqli_query($connection, $sqlRegister);
+
+            if (!$resultRegister) {
+                die("Registration failed: " . mysqli_error($connection));
+            }
+
+            // Redirect to login page after successful registration
+            header("Location: login.php");
+            exit();
         }
-
-        // Redirect to login page after successful registration
-        header("Location: login.php");
-        exit();
     }
 }
 
@@ -73,6 +79,9 @@ mysqli_close($connection);
 
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
+
+        <label for="passwordRepeat">Repeat Password:</label>
+        <input type="password" id="passwordRepeat" name="passwordRepeat" required>
 
         <input type="submit" value="Register">
     </form>
