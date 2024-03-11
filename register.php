@@ -1,11 +1,12 @@
 <?php
 // Include database configuration
-include_once '/u/g/e2202982/public_html/php/harj10/config/db_config.php';
+include_once '/u/g/e2202982/public_html/php/projekti/PHP-Project/config/db_config.php';
 
 // Establish database connection
 $connection = mysqli_connect($servername, $username, $password, $dbname);
 date_default_timezone_set("Europe/Helsinki");
 
+// Check for connection errors
 if (!$connection) {
     die("Connection failed: " . mysqli_connect_error());
 }
@@ -35,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Redirect to login page after successful registration
         header("Location: login.php");
         exit();
-    } 
+    }
 }
 
 // Close the database connection
@@ -44,32 +45,47 @@ mysqli_close($connection);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/register.css">
+    <title>Register</title>
 </head>
+
 <body>
+    <!-- Navigation bar -->
+    <nav>
+        <ul>
+            <li><a href="login.php">Login</a></li>
+            <li><a href="register.php">Register</a></li>
+        </ul>
+    </nav>
 
-<h2>Register</h2>
+    <!-- Registration form -->
+    <h2>Register</h2>
+    <form action="" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
 
-<form action="" method="POST">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
+        <input type="submit" value="Register">
+    </form>
 
-    <input type="submit" value="Register">
-</form>
+    <!-- Display registration error, if any -->
+    <div class="error">
+        <?php echo isset($registrationError) ? $registrationError : ''; ?>
+    </div>
 
-<div class="error">
-    <?php echo isset($registrationError) ? $registrationError : ''; ?>
-</div>
-
-<div class="login-link">
-    <p>Already have an account? <a href="login.php">Login here</a></p>
-</div>
-
+    <!-- Login link -->
+    <div class="login-link">
+        <p>Already have an account? <a href="login.php">Login here</a></p>
+    </div>
 </body>
+
 </html>

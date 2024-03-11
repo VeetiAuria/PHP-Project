@@ -1,16 +1,16 @@
 <?php
 session_start();
 
-// Check if the user is not logged in, redirect to login page
+// Redirect to login page if the user is not logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
 // Include database configuration
-include_once '/u/g/e2202982/public_html/php/projekti/config/db_config.php';
+include_once '/u/g/e2202982/public_html/php/projekti/PHP-Project/config/db_config.php';
 
-// Handle logout if the logout parameter is set
+// Handle logout
 if (isset($_GET['logout'])) {
     session_destroy(); // Destroy the session
     header("Location: login.php"); // Redirect to login page after logout
@@ -21,45 +21,9 @@ if (isset($_GET['logout'])) {
 $connection = mysqli_connect($servername, $username, $password, $dbname);
 date_default_timezone_set("Europe/Helsinki");
 
+// Check for connection errors
 if (!$connection) {
     die("Connection failed: " . mysqli_connect_error());
-}
-
-// Process form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Sanitize input data to prevent SQL injection
-    $sender = mysqli_real_escape_string($connection, $_POST['sender']);
-    $receiver = mysqli_real_escape_string($connection, $_POST['receiver']);
-    $amount = floatval($_POST['amount']); // Convert amount to float
-
-    // Retrieve the latest blockchain index
-    $sqlLatestIndex = "SELECT MAX(block_index) AS max_index FROM votes";
-    $resultLatestIndex = mysqli_query($connection, $sqlLatestIndex);
-    $rowLatestIndex = mysqli_fetch_assoc($resultLatestIndex);
-    $blockchain_index = ($rowLatestIndex['max_index'] !== null) ? $rowLatestIndex['max_index'] + 1 : 1;
-
-    // Retrieve the previous block's current hash
-    $sqlPreviousHash = "SELECT hash FROM votes WHERE id = $blockchain_index - 1";
-    $resultPreviousHash = mysqli_query($connection, $sqlPreviousHash);
-    $rowPreviousHash = mysqli_fetch_assoc($resultPreviousHash);
-    $previousHash = ($rowPreviousHash['hash'] !== null) ? $rowPreviousHash['hash'] : "0";
-
-    $timestamp = date("Y-m-d H:i:s");
-    $hashedData = $blockchain_index . $timestamp . $previousHash . $sender . $receiver . $amount;
-    $currentHash = hash("sha256", $hashedData);
-
-    // Insert data into the database
-    $sql = "INSERT INTO votes (user_id, vote, timestamp, previous_hash, hash) VALUES ({$_SESSION['user_id']}, '$sender $receiver $amount', '$timestamp', '$previousHash', '$currentHash')";
-
-    $result = mysqli_query($connection, $sql);
-
-    if (!$result) {
-        die("Query failed: " . mysqli_error($connection));
-    }
-
-    // Redirect to avoid resubmission and that it doesn't create new timestamp every time when refreshing.
-    header("Location: {$_SERVER['PHP_SELF']}");
-    exit();
 }
 
 // Function to fetch blockchain data from the database
@@ -77,6 +41,7 @@ function getBlockchainData($connection)
             'prev_hash' => $row['previous_hash'],
             'curr_hash' => $row['hash'],
             'vote' => $row['vote'],
+            'user_id' => $row['user_id'],
         );
     }
 
@@ -96,63 +61,30 @@ mysqli_close($connection);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blockchain Voting Web App</title>
-    <style>
-        h2 {
-            text-align: center;
-            color: orangered;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th,
-        td {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-        }
-
-        th {
-            background-color: orangered;
-            color: white;
-        }
-
-        tbody tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        tbody tr:nth-child(odd) {
-            background-color: white;
-        }
-
-        .logout-link {
-            text-align: center;
-            margin-top: 10px;
-            border-radius: 5px;
-            background-color: #f2f2f2;
-            padding: 20px;
-            font-size: 20px;
-        }
-
-        .logout-link a {
-            color: red;
-        }
-    </style>
+    <title>Voting Results</title>
+    <link rel="stylesheet" type="text/css" href="css/blockchain.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
+    <!-- Navigation bar -->
+    <nav>
+        <ul>
+            <li><a href="index.php">Voting</a></li>
+            <li><a href="blockchain.php">Results</a></li>
+            <li style="float: right;"><a href="?logout=1">Log Out</a></li>
+        </ul>
+    </nav>
+
+    <!-- Voting Blockchain Data -->
     <h2>Voting Blockchain Data</h2>
     <table>
         <thead>
             <tr>
                 <th>Block Index</th>
                 <th>Timestamp</th>
-                <th>Previous Hash</th>
-                <th>Current Hash</th>
                 <th>Vote</th>
+                <th>Hashed User ID</th>
             </tr>
         </thead>
         <tbody>
@@ -161,20 +93,98 @@ mysqli_close($connection);
                 echo "<tr>";
                 echo "<td>{$block['index']}</td>";
                 echo "<td>{$block['timestamp']}</td>";
-                echo "<td>{$block['prev_hash']}</td>";
-                echo "<td>{$block['curr_hash']}</td>";
                 echo "<td>{$block['vote']}</td>";
+                echo "<td>" . hash("sha256", $block['user_id']) . "</td>";
                 echo "</tr>";
             }
             ?>
         </tbody>
     </table>
+
+    <!-- Votes in Charts -->
+    <h2>Votes in Charts</h2>
+    <div id="chartContainer" style="display: flex; justify-content: space-between;">
+        <div style="width: 45%;">
+            <canvas id="voteChart"></canvas>
+        </div>
+        <div style="width: 45%;">
+            <canvas id="totalVotesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Logout link -->
     <div class="logout-link">
-        <p>You are logged in as
-            <?php echo $_SESSION['username']; ?>. <br>
+        <p>You are logged in as <?php echo $_SESSION['username']; ?>. <br>
             <a href="?logout=1">Logout</a>
         </p>
     </div>
+
+    <!-- JavaScript code -->
+    <script>
+        var blockchainData = <?php echo json_encode($blockchainData); ?>;
+
+        var voteCounts = {};
+        blockchainData.forEach(function (block) {
+            var vote = block.vote;
+            if (voteCounts[vote]) {
+                voteCounts[vote]++;
+            } else {
+                voteCounts[vote] = 1;
+            }
+        });
+
+        var ctx = document.getElementById('voteChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(voteCounts),
+                datasets: [{
+                    label: 'Vote Counts',
+                    data: Object.values(voteCounts),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Calculate and display total votes
+        var totalVotes = Object.values(voteCounts).reduce(function (acc, count) {
+            return acc + count;
+        }, 0);
+
+        // Create chart for total votes
+        var totalVotesData = {
+            labels: ['Total Votes'],
+            datasets: [{
+                label: 'Total Votes',
+                data: [totalVotes],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var totalVotesCtx = document.getElementById('totalVotesChart').getContext('2d');
+        var totalVotesChart = new Chart(totalVotesCtx, {
+            type: 'bar',
+            data: totalVotesData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
