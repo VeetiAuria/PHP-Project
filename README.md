@@ -17,11 +17,12 @@ Register page:
 
 Voting page:
 
-![image](https://github.com/VeetiAuria/PHP-Project/assets/127295067/d4115c87-ee61-43d7-a2be-816b99332f11)
+![image](https://github.com/VeetiAuria/PHP-Project/assets/127295067/b9ff58a0-eff2-480d-9666-f74b9f3c8679)
+
 
 Results page:
 
-![image](https://github.com/VeetiAuria/PHP-Project/assets/127295067/f1640669-cba9-4877-a973-1f96206ce30d)
+![image](https://github.com/VeetiAuria/PHP-Project/assets/127295067/57d21b6c-ac11-42d3-988f-87aa539998a3)
 
 
 
