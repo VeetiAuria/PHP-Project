@@ -22,7 +22,8 @@ Voting page:
 
 Results page:
 
-![image](https://github.com/VeetiAuria/PHP-Project/assets/127295067/57d21b6c-ac11-42d3-988f-87aa539998a3)
+![image](https://github.com/VeetiAuria/PHP-Project/assets/127295067/28c7b112-716c-4116-8cbd-6c0a0ee342c9)
+
 
 
 
