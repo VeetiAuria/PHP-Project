@@ -76,31 +76,31 @@ mysqli_close($connection);
         </ul>
     </nav>
 
-<!-- Voting Blockchain Data -->
-<h2>Voting Blockchain Data</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Block Index</th>
-            <th>User ID</th>
-            <th>User Vote</th>
-            <th>Timestamp</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        $firstBlock = true;
-        foreach ($blockchainData as $block) {
-            echo "<tr>";
-            echo "<td>{$block['index']}</td>";
-            echo "<td>{$block['user_id']}</td>";
-            echo "<td>{$block['user_vote']}</td>";
-            echo "<td>{$block['timestamp']}</td>";
-            echo "</tr>";
-        }
-        ?>
-    </tbody>
-</table>
+    <!-- Voting Blockchain Data -->
+    <h2>Voting Blockchain Data</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Block Index</th>
+                <th>User ID</th>
+                <th>User Vote</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $firstBlock = true;
+            foreach ($blockchainData as $block) {
+                echo "<tr>";
+                echo "<td>{$block['index']}</td>";
+                echo "<td>{$block['user_id']}</td>";
+                echo "<td>{$block['user_vote']}</td>";
+                echo "<td>{$block['timestamp']}</td>";
+                echo "</tr>";
+            }
+            ?>
+        </tbody>
+    </table>
 
 
     <!-- Votes in Charts -->
@@ -119,115 +119,121 @@ mysqli_close($connection);
             <canvas id="userVotesChart"></canvas>
         </div>
     </div>
-
+    <!-- Logout link -->
+    <div class="logout-link">
+        <p>You are logged in as
+            <?php echo $_SESSION['username']; ?>. <br>
+            <a href="?logout=1">Logout</a>
+        </p>
+    </div>
     <!-- JavaScript code -->
     <script>
-var blockchainData = <?php echo json_encode($blockchainData); ?>;
+        var blockchainData = <?php echo json_encode($blockchainData); ?>;
 
-// Calculate and display total votes
-var voteCounts = {};
-blockchainData.forEach(function (block) {
-    var nonHashedVote = block.vote;
-    if (voteCounts[nonHashedVote]) {
-        voteCounts[nonHashedVote]++;
-    } else {
-        voteCounts[nonHashedVote] = 1;
-    }
-});
-
-// Create chart for total votes
-var totalVotes = Object.values(voteCounts).reduce(function (acc, count) {
-    return acc + count;
-}, 0);
-
-var totalVotesData = {
-    labels: ['Total Votes'],
-    datasets: [{
-        label: 'Total Votes',
-        data: [totalVotes],
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        borderColor: 'rgba(255, 99, 132, 1)',
-        borderWidth: 1
-    }]
-};
-
-var totalVotesCtx = document.getElementById('totalVotesChart').getContext('2d');
-var totalVotesChart = new Chart(totalVotesCtx, {
-    type: 'bar',
-    data: totalVotesData,
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
+        // Calculate and display total votes
+        var voteCounts = {};
+        blockchainData.forEach(function (block) {
+            var nonHashedVote = block.vote;
+            if (voteCounts[nonHashedVote]) {
+                voteCounts[nonHashedVote]++;
+            } else {
+                voteCounts[nonHashedVote] = 1;
             }
-        }
-    }
-});
+        });
 
-// Calculate and display user participation
-var uniqueUserIds = new Set(blockchainData.map(block => block.user_id));
-var userParticipation = uniqueUserIds.size;
+        // Create chart for total votes
+        var totalVotes = Object.values(voteCounts).reduce(function (acc, count) {
+            return acc + count;
+        }, 0);
 
-// Create chart for user participation
-var userParticipationData = {
-    labels: ['User Participation'],
-    datasets: [{
-        label: 'User Participation',
-        data: [userParticipation],
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1
-    }]
-};
+        var totalVotesData = {
+            labels: ['Total Votes'],
+            datasets: [{
+                label: 'Total Votes',
+                data: [totalVotes],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        };
 
-var userParticipationCtx = document.getElementById('userParticipationChart').getContext('2d');
-var userParticipationChart = new Chart(userParticipationCtx, {
-    type: 'bar',
-    data: userParticipationData,
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
+        var totalVotesCtx = document.getElementById('totalVotesChart').getContext('2d');
+        var totalVotesChart = new Chart(totalVotesCtx, {
+            type: 'bar',
+            data: totalVotesData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
-        }
-    }
-});
+        });
 
-// Calculate and display user votes
-var userVoteCounts = {};
-blockchainData.forEach(function (block) {
-    var userVote = block.user_vote;
-    if (userVoteCounts[userVote]) {
-        userVoteCounts[userVote]++;
-    } else {
-        userVoteCounts[userVote] = 1;
-    }
-});
+        // Calculate and display user participation
+        var uniqueUserIds = new Set(blockchainData.map(block => block.user_id));
+        var userParticipation = uniqueUserIds.size;
 
-// Create chart for user votes
-var userVotesData = {
-    labels: Object.keys(userVoteCounts),
-    datasets: [{
-        label: 'User Votes',
-        data: Object.values(userVoteCounts),
-        backgroundColor: 'rgba(255, 206, 86, 0.5)',
-        borderColor: 'rgba(255, 206, 86, 1)',
-        borderWidth: 1
-    }]
-};
+        // Create chart for user participation
+        var userParticipationData = {
+            labels: ['User Participation'],
+            datasets: [{
+                label: 'User Participation',
+                data: [userParticipation],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
 
-var userVotesCtx = document.getElementById('userVotesChart').getContext('2d');
-var userVotesChart = new Chart(userVotesCtx, {
-    type: 'bar',
-    data: userVotesData,
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
+        var userParticipationCtx = document.getElementById('userParticipationChart').getContext('2d');
+        var userParticipationChart = new Chart(userParticipationCtx, {
+            type: 'bar',
+            data: userParticipationData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
-        }
-    }
-});
+        });
+
+        // Calculate and display user votes
+        var userVoteCounts = {};
+        blockchainData.forEach(function (block) {
+            var userVote = block.user_vote;
+            if (userVoteCounts[userVote]) {
+                userVoteCounts[userVote]++;
+            } else {
+                userVoteCounts[userVote] = 1;
+            }
+        });
+
+        // Create chart for user votes
+        var userVotesData = {
+            labels: Object.keys(userVoteCounts),
+            datasets: [{
+                label: 'User Votes',
+                data: Object.values(userVoteCounts),
+                backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                borderColor: 'rgba(255, 206, 86, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var userVotesCtx = document.getElementById('userVotesChart').getContext('2d');
+        var userVotesChart = new Chart(userVotesCtx, {
+            type: 'bar',
+            data: userVotesData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
     </script>
 
 </body>
