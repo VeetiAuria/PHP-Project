@@ -37,13 +37,15 @@ function getBlockchainData($connection)
         $blockchainData[] = array(
             'index' => $row['id'],
             'timestamp' => $row['timestamp'],
-            'prev_hash' => $row['previous_hash'], // Use the previous_hash from the database
-            'vote' => $row['hashed_vote'], // Use hashed_vote instead of vote
+            'prev_hash' => $row['previous_hash'],
+            'vote' => $row['hashed_vote'],
+            'user_id' => $row['user_id'], // Add user_id to the array
         );
     }
 
     return $blockchainData;
 }
+
 
 // Fetch blockchain data
 $blockchainData = getBlockchainData($connection);
@@ -80,18 +82,28 @@ mysqli_close($connection);
             <tr>
                 <th>Block Index</th>
                 <th>Timestamp</th>
-                <th>Vote Hashed</th>
-                <th>Previous Vote</th>
+                <th>Current Vote, Current Hash</th>
+                <th>Previous Vote, Previous Hash</th>
             </tr>
         </thead>
         <tbody>
             <?php
+            $firstBlock = true;
             foreach ($blockchainData as $block) {
                 echo "<tr>";
                 echo "<td>{$block['index']}</td>";
                 echo "<td>{$block['timestamp']}</td>";
                 echo "<td>{$block['vote']}</td>";
-                echo "<td>{$block['prev_hash']}</td>"; // Display previous hash
+                echo "<td>";
+
+                if ($firstBlock) {
+                    echo "0, Genesis block";
+                    $firstBlock = false;
+                } else {
+                    echo "{$block['prev_hash']}";
+                }
+
+                echo "</td>";
                 echo "</tr>";
             }
             ?>
@@ -99,11 +111,15 @@ mysqli_close($connection);
     </table>
 
     <!-- Votes in Charts -->
-    <h2>Votes in Chart</h2>
-    <div id="chartContainer" style="display: flex; justify-content: center;">
-        <div style="width: 45%;">
-            <!-- The remaining chart -->
+    <h2>Votes in Charts</h2>
+    <div id="chartContainer" class="chart-container">
+        <div class="chart">
+            <!-- Total Votes Chart -->
             <canvas id="totalVotesChart"></canvas>
+        </div>
+        <div class="chart">
+            <!-- User Participation Chart -->
+            <canvas id="userParticipationChart"></canvas>
         </div>
     </div>
 
@@ -141,7 +157,7 @@ mysqli_close($connection);
             datasets: [{
                 label: 'Total Votes',
                 data: [totalVotes],
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
                 borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 1
             }]
@@ -159,7 +175,38 @@ mysqli_close($connection);
                 }
             }
         });
+
+        // Calculate and display user participation
+        var uniqueUserIds = new Set(blockchainData.map(block => block.user_id));
+        var userParticipation = uniqueUserIds.size;
+
+        // Create chart for user participation
+        var userParticipationData = {
+            labels: ['User Participation'],
+            datasets: [{
+                label: 'User Participation',
+                data: [userParticipation],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var userParticipationCtx = document.getElementById('userParticipationChart').getContext('2d');
+        var userParticipationChart = new Chart(userParticipationCtx, {
+            type: 'bar',
+            data: userParticipationData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
     </script>
+
 </body>
 
 </html>

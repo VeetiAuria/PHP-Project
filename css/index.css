@@ -1,111 +1,108 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-  h2 {
-    text-align: center;
-    color: #333;
-    margin-top: 30px;
-  }
+h2 {
+  text-align: center;
+  color: #333;
+  margin-top: 30px;
+}
 
-  form {
-    text-align: center;
-    margin-top: 20px;
-  }
+form {
+  text-align: center;
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 60%;
+  margin: 20px auto 40px;
+}
 
-  .choices-box {
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    background-color: #fff;
-    margin: 20px auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 60%;
-  }
+.choice-row {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  padding: 10px;
+}
 
-  .choice-row {
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
+.choice-row:hover {
+  background-color: #f9f9f9;
+}
 
-  .choice-row:hover {
-    background-color: #f9f9f9;
-  }
+.choice-label {
+  font-size: 18px;
+  margin-left: 10px;
+}
 
-  .choice-label {
-    font-size: 16px;
-    margin-left: 10px;
-  }
+.choice-row.selected {
+  background-color: #e6f7ff;
+}
 
-  .choice-row.selected {
-    background-color: #e6f7ff;
-  }
+input[type="submit"] {
+  background-color: orangered;
+  color: white;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
 
-  input[type="submit"] {
-    background-color: orangered;
-    color: white;
-    padding: 10px 15px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
+input[type="submit"]:hover {
+  background-color: orange;
+}
 
-  input[type="submit"]:hover {
-    background-color: orange;
-  }
+input[type="submit"]:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
 
-  input[type="submit"]:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
+.logout-link {
+  text-align: center;
+  border-top: 2px solid #ddd;
+  padding: 20px;
+  font-size: 18px;
+  margin-top: auto;
+}
 
-  .logout-link {
-    text-align: center;
-    border-top: 2px solid #ddd;
-    padding: 20px;
-    font-size: 18px;
-    margin-top: auto;
-  }
+.logout-link a {
+  color: red;
+  text-decoration: none;
+}
 
-  .logout-link a {
-    color: red;
-    text-decoration: none;
-  }
-
-  nav {
-    background-color: #333;
-    padding: 10px;
-    overflow: hidden;
+nav {
+  background-color: #333;
+  padding: 10px;
+  overflow: hidden;
 }
 
 ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 
 li {
-    display: inline;
-    margin-right: 10px;
+  display: inline;
+  margin-right: 10px;
 }
 
 a {
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 a:hover {
-    color: orange;
+  color: orange;
 }

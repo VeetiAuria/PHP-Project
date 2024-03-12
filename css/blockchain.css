@@ -3,12 +3,7 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    background-color: #f2f2f2; /* Use the desired background color */
 }
 
 nav {
@@ -37,18 +32,6 @@ a {
 
 a:hover {
     color: orange;
-}
-
-.logout-link {
-    text-align: center;
-    border-top: 2px solid #ddd;
-    padding: 20px;
-    font-size: 18px;
-}
-
-.logout-link a {
-    color: red;
-    text-decoration: none;
 }
 
 h2 {
@@ -84,36 +67,24 @@ tbody tr:nth-child(odd) {
 
 .chart-container {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
-
-#voteChart,
-#totalVotesChart {
-    width: 100%;
-    max-width: 45%;
+    align-items: center;
     margin-bottom: 20px;
+    padding-left: 250px;
 }
 
-@media (max-width: 768px) {
-    nav ul {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+.chart {
+    width: 48%;
+    height: 300px;
+}
 
-    nav li {
-        display: block;
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
+.logout-link {
+    text-align: center;
+    border-top: 2px solid #ddd;
+    padding: 20px;
+    font-size: 18px;
+}
 
-    table {
-        font-size: 14px;
-    }
-
-    #voteChart,
-    #totalVotesChart {
-        max-width: 100%;
-    }
+.logout-link a {
+    color: red;
+    text-decoration: none;
 }

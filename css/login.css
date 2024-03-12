@@ -52,6 +52,12 @@ input[type="submit"]:hover {
     background-color: orange;
 }
 
+.success {
+    color: green;
+    text-align: center;
+    margin-top: 20px;
+}
+
 .error {
     color: red;
     text-align: center;
@@ -99,4 +105,4 @@ a:hover {
 
 p {
     text-align: center;
- }
+}
