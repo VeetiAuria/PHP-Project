@@ -39,7 +39,8 @@ function getBlockchainData($connection)
             'timestamp' => $row['timestamp'],
             'prev_hash' => $row['previous_hash'],
             'vote' => $row['hashed_vote'],
-            'user_id' => $row['user_id'], // Add user_id to the array
+            'user_id' => $row['user_id'],
+            'user_vote' => $row['vote'],
         );
     }
 
@@ -75,40 +76,32 @@ mysqli_close($connection);
         </ul>
     </nav>
 
-    <!-- Voting Blockchain Data -->
-    <h2>Voting Blockchain Data</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Block Index</th>
-                <th>Timestamp</th>
-                <th>Current Vote, Current Hash</th>
-                <th>Previous Vote, Previous Hash</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $firstBlock = true;
-            foreach ($blockchainData as $block) {
-                echo "<tr>";
-                echo "<td>{$block['index']}</td>";
-                echo "<td>{$block['timestamp']}</td>";
-                echo "<td>{$block['vote']}</td>";
-                echo "<td>";
+<!-- Voting Blockchain Data -->
+<h2>Voting Blockchain Data</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Block Index</th>
+            <th>User ID</th>
+            <th>User Vote</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        $firstBlock = true;
+        foreach ($blockchainData as $block) {
+            echo "<tr>";
+            echo "<td>{$block['index']}</td>";
+            echo "<td>{$block['user_id']}</td>";
+            echo "<td>{$block['user_vote']}</td>";
+            echo "<td>{$block['timestamp']}</td>";
+            echo "</tr>";
+        }
+        ?>
+    </tbody>
+</table>
 
-                if ($firstBlock) {
-                    echo "0, Genesis block";
-                    $firstBlock = false;
-                } else {
-                    echo "{$block['prev_hash']}";
-                }
-
-                echo "</td>";
-                echo "</tr>";
-            }
-            ?>
-        </tbody>
-    </table>
 
     <!-- Votes in Charts -->
     <h2>Votes in Charts</h2>
@@ -121,90 +114,120 @@ mysqli_close($connection);
             <!-- User Participation Chart -->
             <canvas id="userParticipationChart"></canvas>
         </div>
-    </div>
-
-    <!-- Logout link -->
-    <div class="logout-link">
-        <p>You are logged in as
-            <?php echo $_SESSION['username']; ?>. <br>
-            <a href="?logout=1">Logout</a>
-        </p>
+        <div class="chart">
+            <!-- User Votes Chart -->
+            <canvas id="userVotesChart"></canvas>
+        </div>
     </div>
 
     <!-- JavaScript code -->
     <script>
-        var blockchainData = <?php echo json_encode($blockchainData); ?>;
+var blockchainData = <?php echo json_encode($blockchainData); ?>;
 
-        var voteCounts = {};
+// Calculate and display total votes
+var voteCounts = {};
+blockchainData.forEach(function (block) {
+    var nonHashedVote = block.vote;
+    if (voteCounts[nonHashedVote]) {
+        voteCounts[nonHashedVote]++;
+    } else {
+        voteCounts[nonHashedVote] = 1;
+    }
+});
 
-        blockchainData.forEach(function (block) {
-            var nonHashedVote = block.vote; // Use 'vote' column instead of 'hashed_vote'
-            if (voteCounts[nonHashedVote]) {
-                voteCounts[nonHashedVote]++;
-            } else {
-                voteCounts[nonHashedVote] = 1;
+// Create chart for total votes
+var totalVotes = Object.values(voteCounts).reduce(function (acc, count) {
+    return acc + count;
+}, 0);
+
+var totalVotesData = {
+    labels: ['Total Votes'],
+    datasets: [{
+        label: 'Total Votes',
+        data: [totalVotes],
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+    }]
+};
+
+var totalVotesCtx = document.getElementById('totalVotesChart').getContext('2d');
+var totalVotesChart = new Chart(totalVotesCtx, {
+    type: 'bar',
+    data: totalVotesData,
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
             }
-        });
+        }
+    }
+});
 
-        // Calculate and display total votes
-        var totalVotes = Object.values(voteCounts).reduce(function (acc, count) {
-            return acc + count;
-        }, 0);
+// Calculate and display user participation
+var uniqueUserIds = new Set(blockchainData.map(block => block.user_id));
+var userParticipation = uniqueUserIds.size;
 
-        // Create chart for total votes
-        var totalVotesData = {
-            labels: ['Total Votes'],
-            datasets: [{
-                label: 'Total Votes',
-                data: [totalVotes],
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 1
-            }]
-        };
+// Create chart for user participation
+var userParticipationData = {
+    labels: ['User Participation'],
+    datasets: [{
+        label: 'User Participation',
+        data: [userParticipation],
+        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+    }]
+};
 
-        var totalVotesCtx = document.getElementById('totalVotesChart').getContext('2d');
-        var totalVotesChart = new Chart(totalVotesCtx, {
-            type: 'bar',
-            data: totalVotesData,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+var userParticipationCtx = document.getElementById('userParticipationChart').getContext('2d');
+var userParticipationChart = new Chart(userParticipationCtx, {
+    type: 'bar',
+    data: userParticipationData,
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
             }
-        });
+        }
+    }
+});
 
-        // Calculate and display user participation
-        var uniqueUserIds = new Set(blockchainData.map(block => block.user_id));
-        var userParticipation = uniqueUserIds.size;
+// Calculate and display user votes
+var userVoteCounts = {};
+blockchainData.forEach(function (block) {
+    var userVote = block.user_vote;
+    if (userVoteCounts[userVote]) {
+        userVoteCounts[userVote]++;
+    } else {
+        userVoteCounts[userVote] = 1;
+    }
+});
 
-        // Create chart for user participation
-        var userParticipationData = {
-            labels: ['User Participation'],
-            datasets: [{
-                label: 'User Participation',
-                data: [userParticipation],
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        };
+// Create chart for user votes
+var userVotesData = {
+    labels: Object.keys(userVoteCounts),
+    datasets: [{
+        label: 'User Votes',
+        data: Object.values(userVoteCounts),
+        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+        borderColor: 'rgba(255, 206, 86, 1)',
+        borderWidth: 1
+    }]
+};
 
-        var userParticipationCtx = document.getElementById('userParticipationChart').getContext('2d');
-        var userParticipationChart = new Chart(userParticipationCtx, {
-            type: 'bar',
-            data: userParticipationData,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+var userVotesCtx = document.getElementById('userVotesChart').getContext('2d');
+var userVotesChart = new Chart(userVotesCtx, {
+    type: 'bar',
+    data: userVotesData,
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
             }
-        });
-
+        }
+    }
+});
     </script>
 
 </body>
