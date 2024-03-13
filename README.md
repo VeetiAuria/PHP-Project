@@ -1,5 +1,6 @@
 # PHP-Project
-Password is missing from CONFIG, setup your own database connections!
+**Database credentials are missing from config, SETUP YOUR OWN DATABASE CONFIGS!!!**
+
 PHP Project Web Application which uses Blockchain.
 1. Users credentials gets hashed when account is created.
 2. User can login with correct information
