@@ -1,7 +1,7 @@
 <?php
 // Specify database connection details
 $servername = "mariadb.vamk.fi";
-$username = "e2202982";
+$username = "";
 $password = "";
-$dbname = "e2202982_projectphp";
+$dbname = "";
 ?>
